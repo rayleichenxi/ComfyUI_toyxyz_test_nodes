@@ -13,13 +13,13 @@ from nodes import MAX_RESOLUTION, SaveImage, common_ksampler
 from cv2.ximgproc import guidedFilter
 
 import mss #Screen Capture
-import win32gui
-import win32ui
-import win32con
-import win32api
-from win32gui import FindWindow, GetWindowRect #Get window size and location
+# import win32gui
+# import win32ui
+# import win32con
+# import win32api
+# from win32gui import FindWindow, GetWindowRect #Get window size and location
 import ctypes #for Find window
-from ctypes import windll, wintypes
+# from ctypes import windll, wintypes
 
 import trimesh
 
@@ -112,153 +112,153 @@ def save_image(img: torch.Tensor, path, image_format, jpg_quality, png_compress_
 
     return {"filename": filename, "subfolder": subfolder, "type": "output"}
 
-def find_window(name):
+# def find_window(name):
     
-    try:
-        hwnd = ctypes.windll.user32.FindWindowW(0, name)
+#     try:
+#         hwnd = ctypes.windll.user32.FindWindowW(0, name)
         
-        if hwnd:
-            return(True)
-        else:
-            return(False)
-    except:
-        return(False)
+#         if hwnd:
+#             return(True)
+#         else:
+#             return(False)
+#     except:
+#         return(False)
 
 #Get title bar thickness
-def get_title_bar_thickness(hwnd):
-    rect = ctypes.wintypes.RECT()
-    ctypes.windll.user32.GetWindowRect(hwnd, ctypes.pointer(rect))
-    client_rect = ctypes.wintypes.RECT()
-    ctypes.windll.user32.GetClientRect(hwnd, ctypes.pointer(client_rect))
-    title_bar_thickness = (rect.bottom - rect.top) - (client_rect.bottom - client_rect.top)
+# def get_title_bar_thickness(hwnd):
+#     rect = ctypes.wintypes.RECT()
+#     ctypes.windll.user32.GetWindowRect(hwnd, ctypes.pointer(rect))
+#     client_rect = ctypes.wintypes.RECT()
+#     ctypes.windll.user32.GetClientRect(hwnd, ctypes.pointer(client_rect))
+#     title_bar_thickness = (rect.bottom - rect.top) - (client_rect.bottom - client_rect.top)
     
-    return title_bar_thickness
+#     return title_bar_thickness
 
 
-def capture_win_target(handle, window_capture_area_name: str, capture_full_window, window_margin):
-    # Adapted from https://stackoverflow.com/questions/19695214/screenshot-of-inactive-window-printwindow-win32gui
+# def capture_win_target(handle, window_capture_area_name: str, capture_full_window, window_margin):
+#     # Adapted from https://stackoverflow.com/questions/19695214/screenshot-of-inactive-window-printwindow-win32gui
     
-    #Find target windwow and capture window
+#     #Find target windwow and capture window
     
-    window_title = win32gui.GetWindowText(handle)
+#     window_title = win32gui.GetWindowText(handle)
 
-    hwnd = win32gui.FindWindow(None, window_title)
+#     hwnd = win32gui.FindWindow(None, window_title)
     
     
-    if capture_full_window == False:
+#     if capture_full_window == False:
 
-        hwnd_a = win32gui.FindWindow(None, window_capture_area_name)
+#         hwnd_a = win32gui.FindWindow(None, window_capture_area_name)
     
-        bar_thickness = get_title_bar_thickness(hwnd_a)
+#         bar_thickness = get_title_bar_thickness(hwnd_a)
     
-    margin = window_margin
+#     margin = window_margin
     
-    #Get target window position and area
-    try:
-        left, top, right, bottom = win32gui.GetClientRect(hwnd)
-    except:
-        return np.zeros((512, 512, 3), dtype=np.uint8)
-        print("Wrong window handle!")
+#     #Get target window position and area
+#     try:
+#         left, top, right, bottom = win32gui.GetClientRect(hwnd)
+#     except:
+#         return np.zeros((512, 512, 3), dtype=np.uint8)
+#         print("Wrong window handle!")
 
-    x, y, w, h = win32gui.GetWindowRect(hwnd)
+#     x, y, w, h = win32gui.GetWindowRect(hwnd)
     
-    left_w, top_w, right_w, bottom_w = win32gui.GetWindowRect(hwnd)
+#     left_w, top_w, right_w, bottom_w = win32gui.GetWindowRect(hwnd)
     
     
-    if capture_full_window == False:
+#     if capture_full_window == False:
     
-        left_a, top_a, right_a, bottom_a = win32gui.GetWindowRect(hwnd_a)
+#         left_a, top_a, right_a, bottom_a = win32gui.GetWindowRect(hwnd_a)
         
-        top_a = top_a + bar_thickness - margin
+#         top_a = top_a + bar_thickness - margin
         
-        left_a = left_a + margin
+#         left_a = left_a + margin
         
-        right_a = right_a - margin
+#         right_a = right_a - margin
         
-        bottom_a = bottom_a - margin
+#         bottom_a = bottom_a - margin
     
-    #Set crot area
-    if capture_full_window == False:
-        if left_a>left_w:
-            x_crop = left_a-left_w
-        else:
-            x_crop = 0
+#     #Set crot area
+#     if capture_full_window == False:
+#         if left_a>left_w:
+#             x_crop = left_a-left_w
+#         else:
+#             x_crop = 0
         
-        if top_a>top_w:
-            y_crop = top_a-top_w
-        else:
-            y_crop = 0
+#         if top_a>top_w:
+#             y_crop = top_a-top_w
+#         else:
+#             y_crop = 0
         
-        if right_a<right_w:
-            x2_crop = right_a-right_w
-        else:
-            x2_crop = right_w
+#         if right_a<right_w:
+#             x2_crop = right_a-right_w
+#         else:
+#             x2_crop = right_w
         
-        if bottom_a<bottom_w:
-            y2_crop = bottom_a-bottom_w
-        else:
-            y2_crop = bottom_w
+#         if bottom_a<bottom_w:
+#             y2_crop = bottom_a-bottom_w
+#         else:
+#             y2_crop = bottom_w
 
-    w = right - left
-    h = bottom - top
+#     w = right - left
+#     h = bottom - top
     
-    try:
-        #Create bitmap
-        hwnd_dc = win32gui.GetWindowDC(hwnd)
-        mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
-        save_dc = mfc_dc.CreateCompatibleDC()
-        bitmap = win32ui.CreateBitmap()
-        bitmap.CreateCompatibleBitmap(mfc_dc, w, h)
-        save_dc.SelectObject(bitmap)
+#     try:
+#         #Create bitmap
+#         hwnd_dc = win32gui.GetWindowDC(hwnd)
+#         mfc_dc = win32ui.CreateDCFromHandle(hwnd_dc)
+#         save_dc = mfc_dc.CreateCompatibleDC()
+#         bitmap = win32ui.CreateBitmap()
+#         bitmap.CreateCompatibleBitmap(mfc_dc, w, h)
+#         save_dc.SelectObject(bitmap)
 
-        # If Special K is running, this number is 3. If not, 1
-        result = windll.user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 3)
+#         # If Special K is running, this number is 3. If not, 1
+#         result = windll.user32.PrintWindow(hwnd, save_dc.GetSafeHdc(), 3)
 
-        bmpinfo = bitmap.GetInfo()
-        bmpstr = bitmap.GetBitmapBits(True)
+#         bmpinfo = bitmap.GetInfo()
+#         bmpstr = bitmap.GetBitmapBits(True)
         
-    except:
-        pass
+#     except:
+#         pass
 
-    try:
-        img = np.frombuffer(bmpstr, dtype=np.uint8).reshape((bmpinfo["bmHeight"], bmpinfo["bmWidth"], 4))
-    except:
-        return np.zeros((512, 512, 3), dtype=np.uint8)
-    img = np.ascontiguousarray(img)[..., :-1]  # make image C_CONTIGUOUS and drop alpha channel
+#     try:
+#         img = np.frombuffer(bmpstr, dtype=np.uint8).reshape((bmpinfo["bmHeight"], bmpinfo["bmWidth"], 4))
+#     except:
+#         return np.zeros((512, 512, 3), dtype=np.uint8)
+#     img = np.ascontiguousarray(img)[..., :-1]  # make image C_CONTIGUOUS and drop alpha channel
     
-    img = np.array(img, dtype=np.uint8)
+#     img = np.array(img, dtype=np.uint8)
 
-    #Delete hwnd
-    try:
-        win32gui.DeleteObject(bitmap.GetHandle())
-        save_dc.DeleteDC()
-        mfc_dc.DeleteDC()
-        win32gui.ReleaseDC(hwnd, hwnd_dc)
-    except:
-        pass
+#     #Delete hwnd
+#     try:
+#         win32gui.DeleteObject(bitmap.GetHandle())
+#         save_dc.DeleteDC()
+#         mfc_dc.DeleteDC()
+#         win32gui.ReleaseDC(hwnd, hwnd_dc)
+#     except:
+#         pass
     
-    #Image crop
-    if capture_full_window == False:
-        crop_img = img[y_crop:y2_crop, x_crop:x2_crop]
+#     #Image crop
+#     if capture_full_window == False:
+#         crop_img = img[y_crop:y2_crop, x_crop:x2_crop]
         
-        crop_h,crop_w,crop_c = crop_img.shape
+#         crop_h,crop_w,crop_c = crop_img.shape
 
-    if not result:  # result should be 1
-        win32gui.DeleteObject(bitmap.GetHandle())
-        save_dc.DeleteDC()
-        mfc_dc.DeleteDC()
-        win32gui.ReleaseDC(hwnd, hwnd_dc)
-        print(f"Unable to acquire capture! Result: {result}")
-        return np.zeros((512, 512, 3), dtype=np.uint8)
+#     if not result:  # result should be 1
+#         win32gui.DeleteObject(bitmap.GetHandle())
+#         save_dc.DeleteDC()
+#         mfc_dc.DeleteDC()
+#         win32gui.ReleaseDC(hwnd, hwnd_dc)
+#         print(f"Unable to acquire capture! Result: {result}")
+#         return np.zeros((512, 512, 3), dtype=np.uint8)
     
-    if capture_full_window == False:
-        if((crop_h>0) and (crop_w>0)):
-            return crop_img
-        else:
-            return np.zeros((512, 512, 3), dtype=np.uint8)
+#     if capture_full_window == False:
+#         if((crop_h>0) and (crop_w>0)):
+#             return crop_img
+#         else:
+#             return np.zeros((512, 512, 3), dtype=np.uint8)
        
-    if capture_full_window == True:
-        return img
+#     if capture_full_window == True:
+#         return img
 
 
 
@@ -424,54 +424,70 @@ class SaveImagetoPath:
         assert isinstance(image_format, str)
         assert isinstance(image, torch.Tensor)
         assert isinstance(save_sequence, str)
-
         save_sequence: bool = save_sequence == "true"
-
         path: Path = Path(path)
-
-        path2 = path
         
-        if save_sequence :
-            count = 0
-            base_filename, file_extension = path2.stem, path2.suffix
-            while path2.exists():
-                filename = f"{base_filename}_{format(count, '06')}{file_extension}"
-                path2 = Path(path2.parent, filename)
-                count += 1
-
+        # 确保目录存在
         path.parent.mkdir(exist_ok=True)
         
         if image.shape[0] == 1:
-            # batch has 1 image only
-            save_image(
-                image[0],
-                path,
-                image_format,
-                jpg_quality,
-                png_compression,
-            )
-            if save_sequence :
+            # 单图像处理
+            if save_sequence:
+                # 如果启用序列保存，使用带序号的文件名
+                base_path = path.parent
+                base_filename, file_extension = path.stem, path.suffix
+                
+                # 查找未使用的文件名
+                index = 0
+                seq_path = base_path / f"{base_filename}_{index}{file_extension}"
+                while seq_path.exists():
+                    index += 1
+                    seq_path = base_path / f"{base_filename}_{index}{file_extension}"
+                
                 save_image(
                     image[0],
-                    path2,
+                    seq_path,
                     image_format,
                     jpg_quality,
                     png_compression,
                 )
-            
-        else:
-            # batch has multiple images
-            for i, img in enumerate(image):
-                subpath = path.with_stem(f"{path.stem}-{i}")
+            else:
+                # 否则按原路径保存
                 save_image(
-                    img,
-                    subpath,
+                    image[0],
+                    path,
                     image_format,
                     jpg_quality,
                     png_compression,
                 )
+        else:
+            # 多图像处理
+            if save_sequence:
+                # 确定基本文件名和序列起始索引
+                base_path = path.parent
+                base_filename, file_extension = path.stem, path.suffix
+                
+                # 查找一个未被使用的序列起始索引
+                start_index = 0
+                while any((base_path / f"{base_filename}_{start_index + i}{file_extension}").exists() 
+                        for i in range(len(image))):
+                    start_index += len(image)  # 跳过足够多的索引以容纳所有图像
+                
+                # 保存序列
                 for i, img in enumerate(image):
-                    subpath = path.with_stem(f"{path2.stem}-{i}")
+                    seq_path = base_path / f"{base_filename}_{start_index + i}{file_extension}"
+                    
+                    save_image(
+                        img,
+                        seq_path,
+                        image_format,
+                        jpg_quality,
+                        png_compression,
+                    )
+            else:
+                # 按传统方式保存
+                for i, img in enumerate(image):
+                    subpath = path.with_stem(f"{path.stem}-{i}")
                     save_image(
                         img,
                         subpath,
@@ -479,9 +495,8 @@ class SaveImagetoPath:
                         jpg_quality,
                         png_compression,
                     )
-
-        return ()
         
+        return ()
 
 class LatentDelay:
     @classmethod
@@ -576,72 +591,72 @@ class Direct_screenCap:
         },
     } 
 
-    def screencap(self, x, y, width, height, num_frames, delay, target_window, capture_mode):
-        from mss import mss
-        captures = []
+    # def screencap(self, x, y, width, height, num_frames, delay, target_window, capture_mode):
+    #     from mss import mss
+    #     captures = []
 
         
-        with mss() as sct:
+    #     with mss() as sct:
             
-            monitor_default = {
-                    "top": y,
-                    "left": x,
-                    "width": width,
-                    "height": height
-                }
+    #         monitor_default = {
+    #                 "top": y,
+    #                 "left": x,
+    #                 "width": width,
+    #                 "height": height
+    #             }
             
-            if capture_mode == "Default":
-                monitor = monitor_default
+    #         if capture_mode == "Default":
+    #             monitor = monitor_default
                 
-            elif (capture_mode == "window" or capture_mode == "window_crop"):
+    #         elif (capture_mode == "window" or capture_mode == "window_crop"):
             
-                if target_window:
-                    hwnd_a = ctypes.windll.user32.FindWindowW(0, target_window)
+    #             if target_window:
+    #                 hwnd_a = ctypes.windll.user32.FindWindowW(0, target_window)
                     
-                    margin = 11
+    #                 margin = 11
                     
-                    if hwnd_a:
-                        title_bar_thickness = get_title_bar_thickness(hwnd_a)
+    #                 if hwnd_a:
+    #                     title_bar_thickness = get_title_bar_thickness(hwnd_a)
                         
-                        rect = ctypes.wintypes.RECT()
-                        ctypes.windll.user32.GetWindowRect(hwnd_a, ctypes.pointer(rect))
+    #                     rect = ctypes.wintypes.RECT()
+    #                     ctypes.windll.user32.GetWindowRect(hwnd_a, ctypes.pointer(rect))
                         
-                        monitor_number = 1
+    #                     monitor_number = 1
                         
-                        mon = sct.monitors[monitor_number]
+    #                     mon = sct.monitors[monitor_number]
                         
-                        monitor = {
-                            "top": rect.top + title_bar_thickness - margin,
-                            "left": rect.left + margin,
-                            "width": rect.right - (rect.left + margin) - margin,
-                            "height": rect.bottom - rect.top - title_bar_thickness,
-                            "mon": monitor_number,
-                        }
-                    else:
-                        monitor = monitor_default
+    #                     monitor = {
+    #                         "top": rect.top + title_bar_thickness - margin,
+    #                         "left": rect.left + margin,
+    #                         "width": rect.right - (rect.left + margin) - margin,
+    #                         "height": rect.bottom - rect.top - title_bar_thickness,
+    #                         "mon": monitor_number,
+    #                     }
+    #                 else:
+    #                     monitor = monitor_default
                         
-                    if capture_mode == "window_crop":
-                        monitor["top"] = monitor["top"]+y
-                        monitor["left"] = monitor["left"]+x
-                        monitor["width"] = width
-                        monitor["height"] = height
+    #                 if capture_mode == "window_crop":
+    #                     monitor["top"] = monitor["top"]+y
+    #                     monitor["left"] = monitor["left"]+x
+    #                     monitor["width"] = width
+    #                     monitor["height"] = height
                 
-                else:
-                    monitor = monitor_default
+    #             else:
+    #                 monitor = monitor_default
                 
-                if (monitor["width"] <= 0 or monitor["height"] <= 0) :
-                    monitor = monitor_default
+    #             if (monitor["width"] <= 0 or monitor["height"] <= 0) :
+    #                 monitor = monitor_default
             
-            for _ in range(num_frames):
-                sct_img = sct.grab(monitor)
-                img_np = np.array(sct_img)
-                img_torch = torch.from_numpy(img_np[..., [2, 1, 0]]).float() / 255.0
-                captures.append(img_torch)
+    #         for _ in range(num_frames):
+    #             sct_img = sct.grab(monitor)
+    #             img_np = np.array(sct_img)
+    #             img_torch = torch.from_numpy(img_np[..., [2, 1, 0]]).float() / 255.0
+    #             captures.append(img_torch)
                 
-                if num_frames > 1:
-                    time.sleep(delay)
+    #             if num_frames > 1:
+    #                 time.sleep(delay)
         
-        return (torch.stack(captures, 0),)
+    #     return (torch.stack(captures, 0),)
        
 
 class Depth_to_normal:
@@ -1070,4 +1085,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Export_glb": "Export_glb",
     "Load_Random_Text_From_File": "Load_Random_Text_From_File"
 }
+
 
